@@ -1,2 +1,5 @@
 # sonarr_file_filter
-Script to filter sonarr files
+Required python package
+"""
+pip install arrapi 
+"""
