@@ -1,10 +1,6 @@
 from arrapi import SonarrAPI
+from typing import List, Union
 import json,os
-
-#{
-#    "api-key": "<sonarr-api-key>",
-#    "localhost": "<http://localhost-ip:port>"
-#}
 
 animelist= [2]
 
@@ -18,43 +14,50 @@ class SonarrFilter:
 
         self.sonarr = SonarrAPI(self.localhost, self.api_key)
         self.series = self.sonarr.all_series()
-        
+
 
     def get_secrets(self):
         path=os.path.dirname(os.path.abspath(__file__)) 
-
+        
         with open(f'{path}/secrets.json') as f:
             d=f.read()
 
         return json.loads(d)
+    
+    def update_series(self):
+        self.series = self.sonarr.all_series()
 
     
     def remove_tag(self):
         self.series = self.sonarr.all_series()
         for show in self.series:
-            if show.genres.count(str(self.tag)) == 0 and 2 in show.tagsIds and show.seriesType != str(self.tag.lower()):
+            if show.genres.count(str(self.tag)) == 0 and 2 in show.tagsIds and show.seriesType != str(self.tag).lower():
                 self.sonarr.edit_series(series_id=show.id,tags=animelist, apply_tags="remove")
+                
 
 
     def add_tag(self):
         self.series = self.sonarr.all_series()
         for show in self.series:
-            if show.genres.count(str(self.tag)) > 0 and 2 not in show.tagsIds or show.seriesType == str(self.tag.lower()):
+            if show.genres.count(str(self.tag)) > 0 and 2 not in show.tagsIds or show.seriesType == str(self.tag).lower():
                 self.sonarr.edit_series(series_id=show.id,tags=animelist, apply_tags="add")
+                
  
 
     def moveout_show(self):
         self.series = self.sonarr.all_series()
         for show in self.series:
-            if show.tagsIds == [] and show.rootFolderPath == "/"+str(self.tag.lower()):
+            if show.tagsIds == [] and show.rootFolderPath == "/"+str(self.tag).lower():
                 self.sonarr.edit_series(series_id=show.id,path="/tv/"+str(show.title), move_files=True)
+        
 
 
     def movein_show(self):
         self.series = self.sonarr.all_series()
         for show in self.series:
-            if 2 in show.tagsIds and show.rootFolderPath != "/"+str(self.tag.lower()):
-                self.sonarr.edit_series(series_id=show.id,path="/"+str(self.tag.lower())+"/"+str(show.title), move_files=True)
+            if 2 in show.tagsIds and show.rootFolderPath != "/"+str(self.tag).lower():
+                self.sonarr.edit_series(series_id=show.id,path="/"+str(self.tag).lower()+"/"+str(show.title), move_files=True)
+   
 
     def run_all(self):
         self.remove_tag()
@@ -65,5 +68,6 @@ class SonarrFilter:
 
 
 sf = SonarrFilter()
-sf.run_all
+sf.run_all()
+
 
