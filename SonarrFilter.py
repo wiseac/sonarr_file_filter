@@ -66,8 +66,9 @@ class SonarrFilter:
         self.movein_show()
     
 
-
-sf = SonarrFilter()
-sf.run_all()
-
+if __name__ == "__main__":
+    sf = SonarrFilter()
+    sf.run_all()
+    print("Completed")
+    
 
